@@ -24,7 +24,7 @@ proc step*(nes: NES): int =
 
   for i in 1 .. result*3:
     nes.ppu.step()
-    nes.mapper.step(nes.mapper)
+    nes.mapper.step()
 
   when not defined(emscripten):
     for i in 1 .. result:

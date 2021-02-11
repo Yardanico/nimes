@@ -1,6 +1,6 @@
 import types
 
-type Mapper4* = ref object of Mapper
+type Mapper4* = ref object of RootRef
   cartridge: Cartridge
   nes: NES
   register, prgMode, chrMode, reload, counter: uint8
@@ -85,8 +85,7 @@ proc writeRegister(m: Mapper4, adr: uint16, val: uint8) =
     if adr mod 2 == 0: m.irqEnable = false
     else:              m.irqEnable = true
 
-proc step(m: Mapper) =
-  var m = Mapper4(m)
+proc step*(m: Mapper4) =
   let ppu = m.nes.ppu
 
   if ppu.cycle != 300:
@@ -103,8 +102,7 @@ proc step(m: Mapper) =
     if m.counter == 0 and m.irqEnable:
       m.nes.cpu.triggerIRQ()
 
-proc idx(m: Mapper, adr: uint16): uint8 =
-  var m = Mapper4(m)
+proc `[]`*(m: Mapper4, adr: uint16): uint8 =
   case adr
   of 0x0000..0x1FFF:
     let bank = adr div 0x0400
@@ -118,8 +116,7 @@ proc idx(m: Mapper, adr: uint16): uint8 =
     result = m.cartridge.prg[m.prgOffsets[bank]+offset.int]
   else: raise newException(ValueError, "unhandled mapper4 read at: " & $adr)
 
-proc idxSet(m: Mapper, adr: uint16, val: uint8) =
-  var m = Mapper4(m)
+proc `[]=`*(m: Mapper4, adr: uint16, val: uint8) =
   case adr
   of 0x0000..0x1FFF:
     let bank = adr div 0x0400
@@ -137,6 +134,3 @@ proc newMapper4*(cartridge: Cartridge, nes: NES): Mapper4 =
   result.prgOffsets[1] = result.prgBankOffset(1)
   result.prgOffsets[2] = result.prgBankOffset(-2)
   result.prgOffsets[3] = result.prgBankOffset(-1)
-  result.idx = idx
-  result.idxSet = idxSet
-  result.step = step

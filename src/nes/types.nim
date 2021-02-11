@@ -1,3 +1,11 @@
+import iface
+export iface
+
+iface *Mapper:
+  proc step()
+  proc `[]`(adr: uint16): uint8
+  proc `[]=`(adr: uint16, val: uint8)
+
 type
   NES* = ref NESObj
   NESObj* = object
@@ -164,11 +172,6 @@ type
     index*, strobe*: uint8
 
   Buttons* = array[8, bool]
-
-  Mapper* = ref object of RootObj
-    step*: proc(m: Mapper)
-    idx*: proc(m: Mapper, adr: uint16): uint8
-    idxSet*: proc(m: Mapper, adr: uint16, val: uint8)
 
   MirrorModes* = enum
     mirrorHorizontal = 0, mirrorVertical, mirrorSingle0, mirrorSingle1, mirrorFour

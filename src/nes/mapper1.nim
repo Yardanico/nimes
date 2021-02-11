@@ -1,6 +1,6 @@
 import types
 
-type Mapper1* = ref object of Mapper
+type Mapper1* = ref object of RootRef
   cartridge: Cartridge
   shiftRegister, control, prgMode, chrMode, prgBank, chrBank0, chrBank1: uint8
   prgOffsets, chrOffsets: array[0..1, int]
@@ -73,11 +73,10 @@ proc loadRegister(m: Mapper1, adr: uint16, val: uint8) =
       m.writeRegister(adr, m.shiftRegister)
       m.shiftRegister = 0x10
 
-proc step(m: Mapper) =
+proc step*(m: Mapper1) =
   discard
 
-proc idx(m: Mapper, adr: uint16): uint8 =
-  var m = Mapper1(m)
+proc `[]`*(m: Mapper1, adr: uint16): uint8 =
   case adr
   of 0x0000..0x1FFF:
     let bank = adr div 0x1000
@@ -91,8 +90,7 @@ proc idx(m: Mapper, adr: uint16): uint8 =
     result = m.cartridge.prg[m.prgOffsets[bank]+offset.int]
   else: raise newException(ValueError, "unhandled mapper1 read at: " & $adr)
 
-proc idxSet(m: Mapper, adr: uint16, val: uint8) =
-  var m = Mapper1(m)
+proc `[]=`*(m: Mapper1, adr: uint16, val: uint8) =
   case adr
   of 0x0000..0x1FFF:
     let bank = adr div 0x1000
@@ -107,6 +105,3 @@ proc newMapper1*(cartridge: Cartridge): Mapper1 =
   result.cartridge = cartridge
   result.shiftRegister = 0x10
   result.prgOffsets[1] = result.prgBankOffset(-1)
-  result.idx = idx
-  result.idxSet = idxSet
-  result.step = step

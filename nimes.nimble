@@ -13,3 +13,4 @@ skipExt       = @["nim"]
 
 requires "nim >= 0.12.0"
 requires "sdl2 >= 1.0"
+requires "https://github.com/yglukhov/iface >= 0.1.0"
